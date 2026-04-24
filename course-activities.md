@@ -190,8 +190,8 @@
 1. Open your project folder in VS Code
 2. Create the project directory:
    ```bash
-   mkdir -p leadgeneration
-   cd leadgeneration
+   mkdir -p TGS-2025052468-Claude-Code
+   cd TGS-2025052468-Claude-Code
    ```
 3. Create the `.claude` folder structure:
    ```bash
@@ -232,7 +232,7 @@
 
 **Steps:**
 
-1. In your `leadgeneration` folder, start Claude Code:
+1. In your `TGS-2025052468-Claude-Code` folder, start Claude Code:
    ```bash
    claude
    ```
@@ -515,7 +515,7 @@
 
 1. Navigate to your project folder:
    ```bash
-   cd /path/to/leadgeneration
+   cd /path/to/TGS-2025052468-Claude-Code
    ```
 2. Initialize a Git repository:
    ```bash
@@ -536,7 +536,7 @@
    ```
 6. Create a GitHub repository and push in one command:
    ```bash
-   gh repo create leadgeneration --public --source=. --push
+   gh repo create TGS-2025052468-Claude-Code --public --source=. --push
    ```
 7. Verify the push was successful:
    ```bash
@@ -629,7 +629,7 @@
    - Check GitHub repo: `gh repo view`
    - Check GitHub Pages deployment: `gh api repos/{owner}/{repo}/pages`
 
-7. Visit your GitHub Pages URL (typically `https://yourusername.github.io/leadgeneration/`)
+7. Visit your GitHub Pages URL (typically `https://yourusername.github.io/TGS-2025052468-Claude-Code/`)
 
 8. Check the repo about section on GitHub — it should now show:
    - A description of the project
@@ -984,10 +984,10 @@
    ```
    You should see:
    ```
-   /path/to/leadgeneration                 abc1234 [main]
-   /path/to/leadgeneration/.trees/feature1  abc1234 [feature1]
-   /path/to/leadgeneration/.trees/feature2  abc1234 [feature2]
-   /path/to/leadgeneration/.trees/feature3  abc1234 [feature3]
+   /path/to/TGS-2025052468-Claude-Code                 abc1234 [main]
+   /path/to/TGS-2025052468-Claude-Code/.trees/feature1  abc1234 [feature1]
+   /path/to/TGS-2025052468-Claude-Code/.trees/feature2  abc1234 [feature2]
+   /path/to/TGS-2025052468-Claude-Code/.trees/feature3  abc1234 [feature3]
    ```
 
 5. Check the folder structure:
@@ -1069,7 +1069,7 @@
 **Part E — Merge all features back to main:**
 
 18. Go back to the main project folder in VS Code:
-    - File → Open Folder → navigate to your original `leadgeneration` folder
+    - File → Open Folder → navigate to your original `TGS-2025052468-Claude-Code` folder
 
 19. Open the Claude Code terminal and merge all 3 branches:
     ```
@@ -1106,13 +1106,13 @@
 
 1. Go to https://github.com/apps/claude and click **Install**
 
-2. Select the repository `leadgeneration` (or all repositories)
+2. Select the repository `TGS-2025052468-Claude-Code` (or all repositories)
 
 3. Authorize the app
 
 4. Verify installation:
    ```bash
-   gh api repos/{owner}/leadgeneration/installation
+   gh api repos/{owner}/TGS-2025052468-Claude-Code/installation
    ```
 
 **Creating an Issue:**
