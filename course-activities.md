@@ -197,7 +197,9 @@ Try each one in Claude Code:
 
 **Steps:**
 
-1. In Claude Code, ask:
+1. In Claude Code, paste this prompt to create the command file:
+
+   **Prompt:**
    ```
    Create .claude/commands/readme.md as a custom slash command that
    generates or refreshes README.md with these sections in order:
@@ -236,7 +238,9 @@ Try each one in Claude Code:
 
 **Steps:**
 
-1. In Claude Code, ask:
+1. In Claude Code, paste this prompt to create the command file:
+
+   **Prompt:**
    ```
    Create .claude/commands/github-push.md as a custom slash command that:
    1. Runs pre-flight safety checks (.gitignore, secret scan)
@@ -319,7 +323,9 @@ Try each one in Claude Code:
 
 **Steps:**
 
-1. In Claude Code, ask:
+1. In Claude Code, paste this prompt to create the skill file:
+
+   **Prompt:**
    ```
    Create .claude/skills/frontend-design/SKILL.md as a project-level skill.
    Frontmatter: name "frontend-design", description that triggers on the words
@@ -356,31 +362,45 @@ Try each one in Claude Code:
 
 ### Activity 3.2: Create a UX/UI Agent — Oriental Chinese Purple Redesign
 
-**Objective:** Build a custom UX/UI agent and use it to redesign the bride-booking site in an oriental Chinese style with a purple palette.
+**Objective:** Build a custom UX/UI agent at `.claude/agents/ux-reviewer.md` and use it to redesign the bride-booking site in an oriental Chinese style with a purple palette.
 
 **Steps:**
 
-1. In Claude Code, run:
+1. Ask Claude Code to create the agent file:
+
+   **Prompt:**
+   ```
+   Create .claude/agents/ux-reviewer.md as a project-level agent.
+   Frontmatter:
+     name: ux-reviewer
+     description: UX/UI design agent specialising in oriental Chinese aesthetics
+                  with a purple palette. Use when the user asks for an oriental,
+                  Chinese, purple, or eastern-inspired UI redesign.
+     tools: all
+   Body — instruct the agent to:
+   - Use Playwright MCP to screenshot the page first
+   - Apply a purple-dominant palette (deep violet, plum, lavender) with gold accents
+   - Add Chinese-inspired motifs: cloud patterns, lattice borders, jade tones
+   - Use a serif display font with a hint of brush-stroke feel for headings
+   - Add subtle red double-happiness or floral accents on package cards
+   - Maintain elegance, romance, and full responsiveness (375 / 768 / 1024)
+   - Output concrete CSS/HTML edits and apply them
+   - Take an after-screenshot for comparison
+   ```
+
+   *Alternative:* you can also create it interactively via `/agents` → **Create a new agent**.
+
+2. Restart Claude Code so the agent loads, then verify:
    ```
    /agents
    ```
-   Choose **Create a new agent** and name it `ux-reviewer`.
-
-2. Paste this as the agent's instructions:
-   ```
-   You are a UX/UI design agent specialising in oriental Chinese aesthetics.
-   Use Playwright MCP to view the page, then redesign with:
-   - A purple-dominant palette (deep violet, plum, lavender) with gold accents
-   - Chinese-inspired motifs: cloud patterns, lattice borders, jade tones
-   - Serif display font with a hint of brush-stroke feel for headings
-   - Subtle red double-happiness or floral accents on package cards
-   - Maintain elegance, romance, and full responsiveness
-   Output concrete CSS/HTML edits and apply them.
-   ```
+   `ux-reviewer` should appear in the list.
 
 3. Make sure the site is running (`npx serve`).
 
 4. Invoke the agent:
+
+   **Prompt:**
    ```
    @ux-reviewer Redesign the bride-booking site at http://localhost:3000
    with an oriental Chinese style and a purple palette.
@@ -405,7 +425,9 @@ Both hooks are registered in `.claude/settings.json` and matched on Playwright M
 
 **Part A — Create the validation pre-hook:**
 
-1. Ask Claude Code:
+1. Paste this prompt to create the validation script:
+
+   **Prompt:**
    ```
    Create .claude/hooks/validate-booking.js that:
    - Reads tool input from stdin as JSON
@@ -418,7 +440,9 @@ Both hooks are registered in `.claude/settings.json` and matched on Playwright M
 
 **Part B — Create the success-celebration post-hook:**
 
-2. Ask Claude Code:
+2. Paste this prompt to create the TTS script:
+
+   **Prompt:**
    ```
    Create .claude/hooks/booking-success-tts.sh that:
    - Reads stdin
@@ -437,7 +461,9 @@ Both hooks are registered in `.claude/settings.json` and matched on Playwright M
 
 **Part C — Register both hooks:**
 
-4. Ask Claude Code:
+4. Paste this prompt to register both hooks:
+
+   **Prompt:**
    ```
    Create .claude/settings.json that registers:
    - PreToolUse hook on matcher "mcp__playwright" running
