@@ -4,6 +4,11 @@ This repository contains the hands-on course activities and sample project for t
 
 **Register for the course:** [https://www.tertiarycourses.com.sg/wsq-agentic-ai-applications-with-claude-code.html](https://www.tertiarycourses.com.sg/wsq-agentic-ai-applications-with-claude-code.html)
 
+## Live Demos
+
+- **Lead Generation:** [tertiarycourses.github.io/TGS-2025052468-Claude-Code/lead-generation/](https://tertiarycourses.github.io/TGS-2025052468-Claude-Code/lead-generation/)
+- **Bride Booking:** [tertiarycourses.github.io/TGS-2025052468-Claude-Code/bride-booking/](https://tertiarycourses.github.io/TGS-2025052468-Claude-Code/bride-booking/)
+
 ## Course Activities
 
 The step-by-step learner activities are documented in [course-activities.md](course-activities.md), covering:
