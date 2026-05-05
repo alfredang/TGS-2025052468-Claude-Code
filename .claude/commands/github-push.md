@@ -1,80 +1,95 @@
 ---
-description: Push current project to GitHub — scans for secrets, generates/updates README, configures the remote repo (description, topics, homepage), and pushes.
+description: Generate README via /readme, set up GitHub Pages via Actions, then commit, push, and update repo metadata.
 ---
 
 # /github-push
 
-Run a complete "ship to GitHub" flow for the current repository.
-
-Perform the following steps in order. Stop and ask the user if any step needs a decision (e.g. repo name, visibility) — never silently choose.
+Ship the project to GitHub end-to-end. Run these steps in order.
 
 ## 1. Pre-flight safety checks
 
-- Run `git status` and `git rev-parse --show-toplevel` to confirm we're inside a git repo.
-- Verify `.gitignore` exists and contains at minimum: `.env`, `node_modules/`, `.DS_Store`. Add any missing entries.
-- Scan staged + tracked files for accidentally committed secrets (look for `API_KEY=`, `SECRET=`, `TOKEN=`, `PASSWORD=`, AWS access key patterns `AKIA[0-9A-Z]{16}`, OpenAI keys `sk-[A-Za-z0-9]{20,}`, Resend keys `re_[A-Za-z0-9_]+`, etc).
-- If any secrets are found in tracked files, **STOP** and report to the user before proceeding.
-- Run `git check-ignore .env` (and any other dotenv files) to confirm they are ignored.
+- Confirm we're inside a git repo (`git rev-parse --show-toplevel`).
+- Verify `.gitignore` contains at least `.env`, `node_modules/`, `.DS_Store`, `.mcp.json`. Add any missing entries.
+- Scan tracked files for committed secrets (`API_KEY=`, `SECRET=`, `TOKEN=`, AWS `AKIA[0-9A-Z]{16}`, OpenAI `sk-[A-Za-z0-9]{20,}`). **STOP** and report if any are found.
 
-## 2. Generate / update README.md
+## 2. Generate the README
 
-If `README.md` is missing or stale, generate one covering:
+Invoke the project `/readme` slash command to produce `README.md` (tech badges, live demo link, Playwright screenshots, file structure, project description, how to start). Wait for it to finish before continuing.
 
-- **Project title** and a one-line tagline
-- **Overview** — 2-3 sentences on what the project does
-- **Features** — bullet list of key capabilities (inspect the codebase to derive these)
-- **Tech stack** — list languages, frameworks, key libraries
-- **Project structure** — short tree of the top-level folders with one-line descriptions
-- **Getting started** — install + run commands (detect from `package.json`, `requirements.txt`, or static-site indicators)
-- **Configuration** — env vars or config files needed (reference `.env.example` if present)
-- **Sub-projects** — if multiple apps live in subfolders (e.g. `lead-generation/`, `bride-booking/`), list them with one-line descriptions and links
-- **License** — note if a `LICENSE` file is present, else say "All rights reserved" or ask user
+## 3. Add the GitHub Pages workflow
 
-Keep it concise — no filler, no emoji unless the user has used them elsewhere in the project.
+If `.github/workflows/deploy.yml` does not exist, create it:
 
-## 3. Commit any pending changes
+```yaml
+name: Deploy to GitHub Pages
 
-- Show `git status` and `git diff --stat` to the user.
-- If there are uncommitted changes, ask the user whether to commit them and what message to use.
-- Use a HEREDOC for the commit message; include the standard `Co-Authored-By` trailer.
-- Never use `--no-verify` or `--amend` unless the user explicitly asks.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-## 4. Configure / verify GitHub remote
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-- Run `git remote -v` to check for an existing `origin`.
-- If no remote: ask the user for the repo name (default: current folder name) and visibility (`public` / `private`), then create it with `gh repo create <name> --source=. --remote=origin --<visibility> --push`.
-- If a remote exists, skip creation.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
-## 5. Push
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
 
-- Determine the current branch with `git rev-parse --abbrev-ref HEAD`.
-- Push with `git push -u origin <branch>` (only `-u` if upstream not already set).
-- Never force-push without explicit user request.
+If the deployable site lives in a subfolder (e.g. `bride-booking/`), set the `path:` accordingly.
 
-## 6. Update GitHub repo metadata
+## 4. Configure / verify the GitHub remote
+
+- `git remote -v`
+- If no `origin`: ask for repo name (default = folder name) and visibility, then `gh repo create <name> --source=. --remote=origin --<visibility> --push`.
+
+## 5. Commit and push
+
+- Show `git status` and `git diff --stat`.
+- Commit with a HEREDOC message including the standard `Co-Authored-By` trailer.
+- Never use `--no-verify` or `--amend` unless asked.
+- Push: `git push -u origin <current-branch>`.
+
+## 6. Enable GitHub Pages (workflow source)
+
+```bash
+gh api -X POST repos/{owner}/{repo}/pages -f build_type=workflow 2>/dev/null || \
+gh api -X PUT  repos/{owner}/{repo}/pages -f build_type=workflow
+```
+
+(POST first, fall back to PUT if Pages is already configured.)
+
+## 7. Update repo metadata
 
 Use `gh repo edit` to set:
 
-- **Description** — one-line summary derived from the README tagline (≤ 100 chars).
-- **Homepage** — if the project has a deployed URL (Vercel, GitHub Pages, etc.), set it. Otherwise skip.
-- **Topics** — 3-8 relevant topics derived from the tech stack and domain (e.g. `javascript`, `vanilla-js`, `lead-generation`, `apify`, `static-site`).
+- **Description** — one-line summary (≤ 100 chars) from the README tagline.
+- **Homepage** — the GitHub Pages URL from step 6 (`gh api repos/{owner}/{repo}/pages` → `html_url`).
+- **Topics** — 3–8 relevant topics from the tech stack and domain.
 
-Example:
-```bash
-gh repo edit --description "<desc>" --add-topic <t1> --add-topic <t2> ...
-```
+## 8. Final report
 
-## 7. Final report
+Print:
 
-Print a short summary to the user:
-
-- Repo URL (`gh repo view --json url -q .url`)
-- Branch pushed
-- Commit hash
+- Repo URL
+- Live GitHub Pages URL
+- Branch + commit hash
 - Topics applied
-- Any follow-ups (e.g. "remember to confirm Formsubmit activation email")
-
-## Notes
-
-- Always prefer the dedicated `github-push`, `readme`, and `github-about` skills if they are available — they handle edge cases (auto-detecting deploy URLs, secret scanning patterns) more thoroughly than reimplementing the logic here.
-- This command is read-mostly until step 5 — never push or call `gh repo edit` without first showing the user what will change.
+- Note: the first Pages deploy can take ~1 minute to go live.

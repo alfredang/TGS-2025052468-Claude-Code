@@ -191,20 +191,62 @@ Try each one in Claude Code:
 
 ## Topic 2: Tools and Commands
 
-### Activity 2.1: Custom `/github-push` Slash Command
+### Activity 2.1: Custom `/readme` Slash Command
 
-**Objective:** Create a reusable slash command that commits, pushes, and updates GitHub Pages — all in one step.
+**Objective:** Create a reusable `/readme` slash command that generates a polished `README.md` — including tech badges, a live demo link, Playwright screenshots, file structure, project description, and how-to-start instructions.
+
+**Steps:**
+
+1. In Claude Code, ask:
+   ```
+   Create .claude/commands/readme.md as a custom slash command that
+   generates or refreshes README.md with these sections in order:
+   1. Title + one-line tagline
+   2. Tech badges (shields.io flat-square) for the actual stack
+   3. Live Demo link (read GitHub Pages URL via gh api)
+   4. Screenshots — use Playwright MCP to take desktop (1280x800)
+      and mobile (375x812) shots, save under screenshots/
+   5. About this project — 2-4 sentences
+   6. File structure — short tree with one-line descriptions
+   7. How to start the app — exact commands for the detected stack
+   8. License
+   The command should NOT commit or push.
+   ```
+
+2. Make sure the site is running (`npx serve`) so Playwright can screenshot it.
+
+3. Run it:
+   ```
+   /readme
+   ```
+
+4. Review the generated `README.md` and the screenshots under `screenshots/`.
+
+**Checkpoint:** A complete `README.md` exists with badges, live-demo link, both screenshots, file tree, and start commands.
+
+---
+
+### Activity 2.2: Custom `/github-push` Slash Command (Calls `/readme` + GitHub Pages via Actions)
+
+**Objective:** Create a `/github-push` slash command that:
+
+1. Calls `/readme` to refresh the README
+2. Adds a GitHub Actions workflow that deploys to GitHub Pages on every push
+3. Commits, pushes, enables Pages, and updates the repo description / topics / homepage
 
 **Steps:**
 
 1. In Claude Code, ask:
    ```
    Create .claude/commands/github-push.md as a custom slash command that:
-   1. Stages all changes and commits with a clear message
-   2. Pushes to the main branch
-   3. Enables GitHub Pages (workflow source) using gh CLI
-   4. Updates the repo description and topics
-   5. Prints the live GitHub Pages URL
+   1. Runs pre-flight safety checks (.gitignore, secret scan)
+   2. Invokes the project /readme command to refresh README.md
+   3. Creates .github/workflows/deploy.yml using actions/deploy-pages@v4
+      (so GitHub Pages is built by GitHub Actions on every push to main)
+   4. Commits all changes with a clear message and pushes to origin
+   5. Enables GitHub Pages with build_type=workflow via gh api
+   6. Sets repo description, topics, and homepage URL via gh repo edit
+   7. Prints the live GitHub Pages URL
    ```
 
 2. Run it:
@@ -212,13 +254,20 @@ Try each one in Claude Code:
    /github-push
    ```
 
-3. Open the live URL Claude prints.
+3. Watch Claude:
+   - Run `/readme` first to refresh the README + screenshots
+   - Create `.github/workflows/deploy.yml`
+   - Commit and push
+   - Enable Pages and update the repo About section
+   - Print the live URL
 
-**Checkpoint:** The bride-booking site is live on GitHub Pages.
+4. Open the live URL — it should show the bride-booking site (give the first deploy ~1 minute).
+
+**Checkpoint:** The site is live on GitHub Pages, the README has badges + screenshots + a working live-demo link, and the repo About section shows the description, topics, and homepage URL.
 
 ---
 
-### Activity 2.2: Auto-Fill and Submit the Booking Form with Playwright MCP
+### Activity 2.3: Auto-Fill and Submit the Booking Form with Playwright MCP
 
 **Objective:** Use the Playwright MCP server to drive a real browser — open the bride-booking page, fill the booking form, and submit it.
 
@@ -518,8 +567,9 @@ Both hooks are registered in `.claude/settings.json` and matched on Playwright M
 | 1.5 | `/init` | Generate `CLAUDE.md` |
 | 1.6 | Memory | clear, compact, new, resume, rewind |
 | 1.7 | GitHub | Push project to GitHub |
-| 2.1 | Custom Command | `/github-push` slash command |
-| 2.2 | MCP — Playwright | Auto-fill and submit the booking form |
+| 2.1 | Custom Command | `/readme` slash command (badges, screenshots, file tree) |
+| 2.2 | Custom Command | `/github-push` (calls `/readme` + GitHub Pages via Actions) |
+| 2.3 | MCP — Playwright | Auto-fill and submit the booking form |
 | 3.1 | Skills | Install a community skill |
 | 3.2 | Custom Agent | Oriental purple UX/UI redesign |
 | 3.3 | Hooks | Pre-validate booking form data |
