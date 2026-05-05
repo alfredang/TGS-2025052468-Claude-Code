@@ -264,23 +264,44 @@ Try each one in Claude Code:
 
 ## Topic 3: Skills and Agents
 
-### Activity 3.1: Install a Community Skill
+### Activity 3.1: Add a Project-Level Frontend-Design Skill (Rustic Retro Ero)
 
-**Objective:** Install one helpful skill from skills.sh.
+**Objective:** Create a project-scoped skill at `.claude/skills/frontend-design/` that redesigns the bride-booking site in a **rustic retro Ero** style — sepia palette, vintage serif type, aged paper textures, wax-seal buttons.
 
 **Steps:**
 
-1. In Claude Code, install the frontend design skill:
+1. In Claude Code, ask:
    ```
-   /install-skill https://skills.sh/skills/frontend-design
+   Create .claude/skills/frontend-design/SKILL.md as a project-level skill.
+   Frontmatter: name "frontend-design", description that triggers on the words
+   rustic / retro / Ero / vintage / old-world.
+   Body should describe a rustic retro Ero aesthetic:
+   - Palette: sepia, cream, weathered ivory, dusty rose, faded gold, walnut
+   - Vintage serif headings (Playfair Display) + typewriter body (Special Elite)
+   - Aged paper background, subtle grain, vignette
+   - Hand-drawn floral flourishes, art-nouveau dividers
+   - Sepia/duotone filter on gallery images, slight tilt for Polaroid feel
+   - Wax-seal style buttons
+   Include implementation steps that use Playwright MCP to screenshot before/after.
    ```
 
-2. Verify:
+2. Restart Claude Code so it picks up the new skill.
+
+3. Verify it loaded:
    ```
-   What skills do I have available?
+   What skills are available?
+   ```
+   You should see `frontend-design` in the list.
+
+4. Make sure the site is running (`npx serve`), then invoke the skill:
+   ```
+   Use the frontend-design skill to redesign the bride-booking site at
+   http://localhost:3000 in a rustic retro Ero style.
    ```
 
-**Checkpoint:** The `frontend-design` skill is listed.
+5. Review the before/after screenshots Claude produces and the CSS changes applied.
+
+**Checkpoint:** The bride-booking site now has a sepia, vintage, paper-textured look — and the booking form still works.
 
 ---
 
@@ -322,48 +343,83 @@ Try each one in Claude Code:
 
 ---
 
-### Activity 3.3: Pre-Validate the Booking Form with a Hook
+### Activity 3.3: Pre- and Post-Submit Hooks for the Booking Form
 
-**Objective:** Add a `PreToolUse` hook that validates the booking form data before it is submitted, so bad data never reaches Formsubmit.
+**Objective:** Add two project-level hooks under `.claude/hooks/`:
+
+1. **PreToolUse** — validates the booking form data before the browser submits it.
+2. **PostToolUse** — when the submission succeeds, plays a sound and uses TTS to announce *"Hurray, your form is submitted"*.
+
+Both hooks are registered in `.claude/settings.json` and matched on Playwright MCP tool calls.
 
 **Steps:**
 
-1. In Claude Code, run:
+**Part A — Create the validation pre-hook:**
+
+1. Ask Claude Code:
+   ```
+   Create .claude/hooks/validate-booking.js that:
+   - Reads tool input from stdin as JSON
+   - If the input mentions booking-form fields (Full Name, Preferred Date, etc.),
+     check: Full Name non-empty, Email matches an email regex, Phone has 8+ digits,
+     Preferred Date is today or later, Number of People is a positive integer
+   - On failure, print errors to stderr and exit with code 2 to block the tool call
+   - Otherwise pass input through unchanged
+   ```
+
+**Part B — Create the success-celebration post-hook:**
+
+2. Ask Claude Code:
+   ```
+   Create .claude/hooks/booking-success-tts.sh that:
+   - Reads stdin
+   - If the output mentions a successful booking submission
+     (e.g. "success", "thank you", "booking confirmed")
+   - Play /System/Library/Sounds/Glass.aiff with afplay
+   - Use `say -v Samantha "Hurray, your form is submitted"` for TTS
+   - Always pass the original output through unchanged
+   Make the script executable.
+   ```
+
+3. Make the shell script executable:
+   ```bash
+   chmod +x .claude/hooks/booking-success-tts.sh
+   ```
+
+**Part C — Register both hooks:**
+
+4. Ask Claude Code:
+   ```
+   Create .claude/settings.json that registers:
+   - PreToolUse hook on matcher "mcp__playwright" running
+     "node $CLAUDE_PROJECT_DIR/.claude/hooks/validate-booking.js"
+   - PostToolUse hook on matcher "mcp__playwright" running
+     "bash $CLAUDE_PROJECT_DIR/.claude/hooks/booking-success-tts.sh"
+   ```
+
+5. Restart Claude Code so both hooks load. Verify:
    ```
    /hooks
    ```
-   Choose **Create a new hook** → type **PreToolUse**.
+   Both should be listed.
 
-2. Matcher (so the hook runs before browser form-fill / network requests):
-   ```
-   mcp__playwright
-   ```
+**Part D — Test the full pipeline:**
 
-3. Hook command:
-   ```
-   node .claude/hooks/validate-booking.js
-   ```
+6. Make sure the site is running (`npx serve`).
 
-4. Ask Claude Code to create the script:
+7. Test the **pre-hook** with bad data:
    ```
-   Create .claude/hooks/validate-booking.js that:
-   - Reads tool input from stdin (JSON)
-   - If the input contains booking-form fields, check:
-     * Full Name is non-empty
-     * Email matches a basic email regex
-     * Phone has at least 8 digits
-     * Preferred Date is today or later
-     * Number of People is a positive integer
-   - If any check fails, print the errors to stderr and exit with code 2
-     (this blocks the tool call)
-   - Otherwise, pass the input through unchanged to stdout
+   Use Playwright to fill the booking form with an empty Full Name and submit it.
    ```
+   The hook should block the submission and print validation errors.
 
-5. Test the hook by asking Claude to submit a booking with a missing email — the hook should block it.
+8. Test the **post-hook** with valid data:
+   ```
+   Use Playwright to fill the booking form with valid details and submit it.
+   ```
+   You should hear the Glass sound and Samantha saying *"Hurray, your form is submitted"*.
 
-6. Test again with valid data — the hook lets it through.
-
-**Checkpoint:** Invalid bookings are blocked before the browser submits them.
+**Checkpoint:** Invalid bookings are blocked; successful bookings trigger the sound + TTS announcement.
 
 ---
 
