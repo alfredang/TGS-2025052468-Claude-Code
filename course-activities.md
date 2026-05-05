@@ -95,11 +95,10 @@
    Style: elegant, romantic, blush pink + gold accents.
    ```
 
-2. Start a local server and open the page:
-   ```bash
-   npx serve
-   ```
-   Visit http://localhost:3000.
+2. Open the page directly in your browser — it's pure static HTML, no server needed:
+   - Mac: `open index.html`
+   - Windows: `start index.html`
+   - Or just double-click the file in Finder / Explorer
 
 3. Test by submitting a booking — you should see a success message.
 
@@ -215,7 +214,7 @@ Try each one in Claude Code:
    The command should NOT commit or push.
    ```
 
-2. Make sure the site is running (`npx serve`) so Playwright can screenshot it.
+2. The page is just `index.html` — Playwright will open it directly via `file://` (no server needed).
 
 3. Run it:
    ```
@@ -291,15 +290,10 @@ Try each one in Claude Code:
 
 2. Restart Claude Code so it loads the MCP server.
 
-3. Make sure the site is running:
-   ```bash
-   npx serve
-   ```
-
-4. In Claude Code, ask:
+3. In Claude Code, ask:
    ```
    Use Playwright MCP to:
-   1. Open http://localhost:3000
+   1. Open the local index.html file (use file:// path)
    2. Scroll to the booking form
    3. Fill in: Full Name "Jane Tan", Email "jane@example.com",
       Phone "98765432", Preferred Date next Saturday, Preferred Time "2pm",
@@ -309,7 +303,7 @@ Try each one in Claude Code:
    5. Take a screenshot of the success message
    ```
 
-5. Watch Claude operate the browser and confirm the success state.
+4. Watch Claude operate the browser and confirm the success state.
 
 **Checkpoint:** The form was filled and submitted by Playwright, and a confirmation screenshot was captured.
 
@@ -348,10 +342,10 @@ Try each one in Claude Code:
    ```
    You should see `frontend-design` in the list.
 
-4. Make sure the site is running (`npx serve`), then invoke the skill:
+4. Invoke the skill — Playwright will open `index.html` directly:
    ```
-   Use the frontend-design skill to redesign the bride-booking site at
-   http://localhost:3000 in a rustic retro Ero style.
+   Use the frontend-design skill to redesign the bride-booking
+   index.html in a rustic retro Ero style.
    ```
 
 5. Review the before/after screenshots Claude produces and the CSS changes applied.
@@ -396,17 +390,15 @@ Try each one in Claude Code:
    ```
    `ux-reviewer` should appear in the list.
 
-3. Make sure the site is running (`npx serve`).
-
-4. Invoke the agent:
+3. Invoke the agent — Playwright will open `index.html` directly:
 
    **Prompt:**
    ```
-   @ux-reviewer Redesign the bride-booking site at http://localhost:3000
-   with an oriental Chinese style and a purple palette.
+   @ux-reviewer Redesign the bride-booking index.html with an
+   oriental Chinese style and a purple palette.
    ```
 
-5. Review the changes in the browser.
+4. Review the changes by reopening `index.html` in your browser.
 
 **Checkpoint:** The site shows a purple oriental redesign and still works on mobile.
 
@@ -480,15 +472,13 @@ Both hooks are registered in `.claude/settings.json` and matched on Playwright M
 
 **Part D — Test the full pipeline:**
 
-6. Make sure the site is running (`npx serve`).
-
-7. Test the **pre-hook** with bad data:
+6. Test the **pre-hook** with bad data:
    ```
    Use Playwright to fill the booking form with an empty Full Name and submit it.
    ```
    The hook should block the submission and print validation errors.
 
-8. Test the **post-hook** with valid data:
+7. Test the **post-hook** with valid data:
    ```
    Use Playwright to fill the booking form with valid details and submit it.
    ```
